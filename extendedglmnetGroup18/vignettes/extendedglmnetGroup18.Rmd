@@ -1,0 +1,209 @@
+---
+title: "Introduction to extendedglmnetGroup18 Package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{extendedglmnetGroup18}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+extendedglmnetGroup18 Package is a extended version of the `glmnet` package that implements random lasso regression, a model created by Wang et.al.This vignette will introduce 4 scenarios/cases that uses the package.The package has a single function called `extended_glmnet` that performs model fitting and checks the model performance.The models that they use are the following.  
+
+```
+* Linear Regression/ Logistic regression
+* Ridge Regression
+* Lasso Regression
+* Random Lasso Regression
+```
+
+Especially for random lasso, parameters $q_1$ and $q_2$, the numbers of predictors to select must be obtained by k-cross validation to perform the random lasso, which k value is assigned by `nfold`. The user can specify a subset of values of each $q_1$ and $q_2$ to do the cross validation using the function parameter `len`. 
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(extendedglmnetGroup18)
+```
+
+
+# Case 01 - Continuous Response
+
+A user wants to predict whether Ozone concentration(ppb) using the following predictors based on 153 observations with 3 numeric predictors.
+
+* `Temp`: numeric	Maximum daily temperature (degrees F)
+* `Solar.R`: numeric Solar radiation
+* `Wind`:	numeric	average wind speed in miles per hour
+
+## Data Preprocessing
+```{r,warning=FALSE,message=FALSE}
+data("airquality")
+dat=airquality[,c(1,2,3,4)]
+colSums(is.na(dat)) # The number of NA values for each column
+dim(na.omit(dat)) # The number of rows and columns in the data
+
+y=dat$Ozone
+X=dat[,-1]
+```
+The user creates a vector of $y$ response, and $X$ data frame of predictors for each column. Although there are missing values in the data, the user can input the data into the function since the function deletes the rows of missing values given the data. Therefore, the user will only be using `r nrow(na.omit(dat))` observations for fitting the model when there were originally `r nrow(dat)` observations.
+
+Now,the user will try to fit 4 different models.
+
+* Multiple Linear Regression
+* Ridge Regression
+* Lasso Regression
+* Random Lasso Regression 
+
+It uses 75% of the data for training data and 25% for test data to calculate the root mean square error and see the model performance. For random lasso regression, it uses 5-fold cross validation to find parameters $q_1$, and $q_2$ from 2 different values each. If the number of predictors is less than or equal to four, by default, it will consider all possible $q_1$, and $q_2$ values.
+
+## Model Fitting and Performance 
+```{r,warning=FALSE,message=FALSE,error=TRUE}
+set.seed(123)
+linear=extended_glm(y,X,model='linear',prob=0.75)
+set.seed(123)
+ridge=extended_glm(y,X,model='ridge',prob=0.75)
+set.seed(123)
+lasso=extended_glm(y,X,model='lasso',prob=0.75)
+set.seed(123)
+random_lasso=extended_glm(y,X,model='random_lasso',prob=0.75,nfold=5)
+
+result=as.vector(c(linear,ridge,lasso,random_lasso))
+names(result)=paste0('RMSE','.',c('linear','ridge','lasso','random_lasso'));result
+```
+Based on the plotting and metrics, it seems to be that random lasso performed better based on the value `r random_lasso`.  
+
+--- 
+
+# Case 02 - Continuous Response
+
+This time the user tries to fit 4 different models with given $y$ response and $X$, a set of 3 numeric predictors where we use 100% training data set to fit the model. There is no missing value in the data, and the data size is 578 observations. 
+
+* Multiple Linear Regression
+* Ridge Regression
+* Lasso Regression
+* Random Lasso Regression 
+
+```{r,warning=FALSE,message=FALSE}
+data("ChickWeight")
+dat=ChickWeight
+colSums(is.na(dat)) # No NA values
+dim(na.omit(dat)) # The number of rows and columns in the data
+
+y=dat$weight
+x1=dat$Time
+x2=(dat$Time+rnorm(length(dat$Time)))^2
+x3=2*dat$Time+rexp(length(dat$Time))
+X=cbind(x1=x1,x2=x2,x3=x3)
+```
+
+Then they calculate the root mean square error on the data and see the model performance. For random lasso regression, it uses 10-fold cross validation to find parameters $q_1$, and $q_2$ for all possible values. 
+
+## Model Fitting and Performance 
+```{r,warning=FALSE,message=FALSE,error=TRUE}
+set.seed(123)
+linear=extended_glm(y,X,model='linear',prob=1)
+set.seed(123)
+ridge=extended_glm(y,X,model='ridge',prob=1)
+set.seed(123)
+lasso=extended_glm(y,X,model='lasso',prob=1)
+set.seed(123)
+random_lasso=extended_glm(y,X,model='random_lasso',prob=1,nfold=10)
+
+result=as.vector(c(linear,ridge,lasso,random_lasso))
+names(result)=paste0('RMSE','.',c('linear','ridge','lasso','random_lasso'));result
+```
+Based on the plotting and metrics, it seems to be that ridge performed better based on the value `r ridge`.
+
+---
+
+# Case 03 - Binary Response 
+
+A user wants to whether the female crab had any other males, called satellites, residing near her using the following predictors based on 173 observations and 1 numeric and 1 categorical predictors (3 levels).
+
+* `weight`: numeric the female crab’ weight
+* `width`:	numeric the female crab’s carapace (shell) width
+* `spine`:	numeric the female crab’ spine condition
+
+`spine` is a categorical variable; thus, we need to change to a factor data type. There are no missing values for the data, and as a result of one hot encoding there are actually 3 predictors. 
+
+## Data Preprocessing
+```{r,warning=FALSE,message=FALSE}
+Crabs <- read.table("http://www.stat.ufl.edu/~aa/cat/data/Crabs.dat", header=TRUE)
+colSums(is.na(Crabs)) # No missing values
+y=Crabs$y
+X=Crabs[,c(4,5,7)]
+X$spine=as.factor(X$spine)
+```
+
+The user tries to fit 4 different models.
+
+* Logistic Regression
+* Ridge Regression
+* Lasso Regression
+* Random Lasso Regression 
+
+It uses 80% of the data for training data and 20% for test data to calculate the root mean square error on that data and see the model performance. For random lasso regression, it uses 3-fold cross validation to find parameters $q_1$, and $q_2$ from 2 different values each. 
+
+## Model Fitting and Performance 
+```{r,warning=FALSE,message=FALSE,error=TRUE}
+set.seed(123)
+extended_glm(y,X,model='linear',prob=0.8)
+set.seed(123)
+extended_glm(y,X,model='ridge',prob=0.8)
+set.seed(123)
+extended_glm(y,X,model='lasso',prob=0.8)
+set.seed(123)
+extended_glm(y,X,model='random_lasso',prob=0.8,nfold=3,len=2)
+```
+
+--- 
+
+# Case 04 - Both
+
+This case is to show how the functions deal with data sets that have less observations than the number of predictors in the training data to fit the linear model. Given the data of $y$ response(binary or continuous),and $X$ matrix of one numeric and one binary predictor with 10 observations, it uses 10% of the data for training data and 90% for test data to calculate the root mean square error on that data and see the model performance. One thing to be aware is in situations where there are few factor variables such as 2 variables with 3 levels each, the number of predictors is not 2 but actually 4 parameters/variables to fit due to one hot encoding the predictors to fit the data. 
+
+## Data
+```{r,warning=FALSE,message=FALSE}
+y=rnorm(10)
+X=data.frame(x1=rexp(10),x2=as.factor(sample(1:2,10,replace=T)))
+
+y_b=sample(c(0,1),10,replace=T)
+X_b=data.frame(x1=rexp(10),x2=as.factor(sample(1:2,10,replace=T)))
+```
+
+## Model Fitting and Performance 
+```{r,warning=FALSE,message=FALSE,error=TRUE}
+set.seed(1)
+extended_glm(y,X,model='linear',prob=0.1)
+
+extended_glm(y_b,X_b,model='linear',prob=0.1)
+set.seed(1)
+```
+As we expected, this throws us an error that __Number of observation < Number of variables__. The ridge, lasso, and random lasso model works for data with small sample size than the number of predictors. Nonetheless, especially, for random lasso, if the training data size is two small, it cannot perform the cross validation to find the best tuning parameter for regularization, and $q_1$ and $q_2$. This is an example where there are 53 predictors and 578 observations. 
+
+## Data
+```{r,warning=FALSE,message=FALSE}
+dat=ChickWeight
+y=dat$weight
+X=dat[,-1]
+dim(model.matrix(~.,data=dat)[,-c(1,2)]) # There are 53 predictors and 578 obs
+```
+
+## Model Fitting and Performance 
+```{r,warning=FALSE,message=FALSE,error=TRUE}
+set.seed(123)
+extended_glm(y,X,model='ridge',prob=0.05)
+set.seed(123)
+extended_glm(y,X,model='lasso',prob=0.05)
+set.seed(123)
+extended_glm(y,X,model='random_lasso',prob=0.05,nfold=10,len=3) # Error
+extended_glm(y,X,model='random_lasso',prob=0.5,nfold=5,len=3) # Increase probability/ reduce the fold to 5
+```
+
+As you can see, the training set has 29 obs and 53 predictors, ridge, lasso, and random lasso have performed the fitting. However, for random lasso, as the size of each fold is too small, the user had to increase the size of the training data by increasing the value of `prob`.
+
+
+
+
