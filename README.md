@@ -1,9 +1,7 @@
 # Extended Glmnet Package 
 
 ## Project Description 
-This R package is my AMS 597, Statistical Computing, Final Project. The detailed description can be found in the *AMS597ProjectSpring2022.pdf*. 
-
-extendedglmnetGroup18 Package is a extended version of the `glmnet` package that implements random lasso regression, a model created by Wang et.al (*ScientificPaper_ProjectSpring2022.pdf*). The `extended_glmnet` takes as an input a response variable $y$ (binary or continuous) and a set of candidate predictors/independent variables $X$. Then, it fits the model the user specified, calculates, and visualizes the model performance on the test data or the entire input data, depending on the user input on the size of test data. For some models, the number of predictors can be larger than the sample size but for others, the function will throw an error if so. The model options are given below.
+extendedglmnetGroup18 Package is my AMS 597, Statistical Computing, Final Project. It is a extended version of the `glmnet` package that implements random lasso regression, a model created by Wang et.al (*ScientificPaper_ProjectSpring2022.pdf*). The `extended_glmnet` function of the package takes as an input a response variable $y$ (binary or continuous) and a set of candidate predictors/independent variables $X$. Then, it splits the data into training and testing data, and fits the training data to the model that the user specified. Then it calculates, and visualizes the model's prediction performance on the test data. The model options are given below.
 
 * Linear Regression/ Logistic regression
 * Ridge Regression
@@ -12,13 +10,15 @@ extendedglmnetGroup18 Package is a extended version of the `glmnet` package that
 
 
 ## How to use the package
+First, read docstrings from the `extended_glm.R` file and *vignettes* file to see detailed instruction on how and when to use the `extended_glmnet` function. Download the `extendedglmnetGroup18_0.1.0.tar.gz` file and import the extendedglmnetGroup18 package and glmnet package(>= 4.1-2). 
 
 
 ### Executing Program 
 * Download R version (>=4.1.0)
 * Imports: glmnet (>= 4.1-2)
 
-# Useful Directories 
+## Directories 
+
 ```
 ├── extendedglmnetGroup18
     ├── R
@@ -27,5 +27,4 @@ extendedglmnetGroup18 Package is a extended version of the `glmnet` package that
         ├── extendedglmnetGroup18.R
         ├── extendedglmnetGroup18.Rmd
         ├── extendedglmnetGroup18.html
-    ├── DESCRIPTION
 ```
