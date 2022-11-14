@@ -8,6 +8,8 @@ extendedglmnetGroup18 Package is my AMS 597, Statistical Computing, Final Projec
 * Lasso Regression
 * Random Lasso Regression
 
+For binary variable, accuracy score, and confusion matrix is returned to show model performance while, for continuous variable, RMSE and a scatter plot of predicted values and actual values are returned. 
+
 
 ## How to use the package
 First, read docstrings from the `extended_glm.R` file and *vignettes* file to see detailed instruction on how and when to use the `extended_glmnet` function. Download the `extendedglmnetGroup18_0.1.0.tar.gz` file and import the extendedglmnetGroup18 package and glmnet package(>= 4.1-2). 
