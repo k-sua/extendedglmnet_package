@@ -13,6 +13,7 @@ extendedglmnetGroup18 Package is a extended version of the `glmnet` package that
 * Random Lasso Regression
 ```
 
+```
 ├── app
 │   ├── css
 │   │   ├── **/*.css
@@ -31,6 +32,7 @@ extendedglmnetGroup18 Package is a extended version of the `glmnet` package that
 ├── package.json
 ├── bower.json (if using bower)
 └── .gitignore
+```
 
 ## How to use the package
 
